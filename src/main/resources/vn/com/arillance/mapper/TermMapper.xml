@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="vn.com.arillance.cleanhome.mapper.TermMapper">
+
+	<!-- RESULT MAP ############################################################################################# -->
+
+	<resultMap id="termMap"	type="vn.com.arillance.cleanhome.model.TermModel">
+		<id column="term_id" property="termId" />
+		<result column="service_id" property="serviceId" />
+		<result column="term_content" property="termContent" />
+	</resultMap>
+	<!-- ######################################################################################################## -->
+	<select id="getTermList" resultMap="termMap" parameterType="int">
+		SELECT * FROM term
+		WHERE
+		service_id = #{serviceId}
+	</select>
+</mapper>

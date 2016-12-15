@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="vn.com.arillance.cleanhome.mapper.CategoryMapper">
+
+	<!-- RESULT MAP ############################################################################################# -->
+
+	<resultMap id="categoryMap" type="vn.com.arillance.cleanhome.model.CategoryModel">
+		<id column="category_id" property="catId" />
+		<result column="category_name" property="catName" />
+	</resultMap>
+	<!-- ######################################################################################################## -->
+
+
+	<select id="getAllCategorys" resultMap="categoryMap" parameterType="map">
+		SELECT * FROM category
+		WHERE
+		category.category_id>0
+		<if test="incDeleted != true">
+			AND category.delete_flag=0
+		</if>
+		ORDER BY category.category_name ASC
+	</select>
+</mapper>

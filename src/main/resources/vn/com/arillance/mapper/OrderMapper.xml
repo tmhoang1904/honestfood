@@ -1,0 +1,202 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="vn.com.arillance.cleanhome.mapper.OrderMapper">
+	<!-- RESULT MAP ############################################################################################# -->
+	<resultMap id="orderMap" type="vn.com.arillance.cleanhome.model.OrderModel">
+		<id column="order_id" property="orderId" />
+		<result column="longitude" property="longitude" />
+		<result column="order_code" property="orderCode" />
+		<result column="latitude" property="latitude" />
+		<result column="customer_name" property="customerName" />
+		<result column="address" property="address" />
+		<result column="start_time" property="startTime" />
+		<result column="note" property="note" />
+		<result column="delete_flag" property="deleteFlag" />
+		<result column="status_flag" property="statusFlag" />
+		<result column="confirm_flag" property="confirmFlag" />
+		<result column="create_time" property="createTime" />
+		<result column="this_week" property="thisWeek" />
+		<result column="mobile" property="mobile" />
+		<result column="bill_amount" property="billAmount" />
+		<result column="shift_fee" property="shiftFee" />
+		<result column="read_flag" property="readFlag" />
+		<association property="owner"
+			resultMap="vn.com.arillance.cleanhome.mapper.UserMapper.userMap" />
+		<association property="category" resultMap="catMap" />
+		<association property="district" resultMap="districtMap" />
+		<collection property="foodList" column="order_id"
+			ofType="vn.com.arillance.cleanhome.model.FoodModel" resultMap="foodMap" />
+		<!-- <association property="owner" -->
+		<!-- resultMap="vn.com.arillance.cleanhome.mapper.UserMapper.userMap" /> -->
+	</resultMap>
+	<!-- <resultMap type="vn.com.arillance.cleanhome.model.CartModel" id="cartMap"> 
+		<id column="cart_id" property="cartId" /> <result column="cart_amount" property="cartAmount" 
+		/> <result column="delete_flag" property="deleteFlag" /> <result column="status_flag" 
+		property="statusFlag" /> <result column="created_time" property="createdTime" 
+		/> <result column="updated_time" property="updatedTime" /> <association property="cartOwner" 
+		resultMap="vn.com.arillance.cleanhome.mapper.UserMapper.userMap" /> <collection 
+		property="foodShopList" column="cart_id" ofType="vn.com.arillance.cleanhome.model.FoodUsersModel" 
+		resultMap="foodUserMap" /> </resultMap> -->
+
+	<resultMap id="catMap"
+		type="vn.com.arillance.cleanhome.model.CategoryModel">
+		<id column="category_id" property="categoryId" />
+		<result column="category_name" property="categoryName" />
+		<result column="delete_flag" property="deleteFlag" />
+		<result column="category_img_url" property="imgUrl" />
+		<collection property="foodCategories" column="food_category_id"
+			ofType="vn.com.arillance.cleanhome.model.FoodCategoryModel"
+			resultMap="foodCatMap" />
+	</resultMap>
+	<resultMap id="foodUserMap"
+		type="vn.com.arillance.cleanhome.model.FoodUsersModel">
+		<id property="foodUsersId" column="food_users_id" />
+		<result column="quantity" property="quantity" />
+		<result column="food_status_flag" property="statusFlag" />
+		<result column="created_time" property="createdTime" />
+		<result column="updated_time" property="updatedTime" />
+		<association property="food" resultMap="foodMap" />
+		<association property="shop"
+			resultMap="vn.com.arillance.cleanhome.mapper.UserMapper.empMap" />
+	</resultMap>
+	<resultMap id="foodCatMap"
+		type="vn.com.arillance.cleanhome.model.FoodCategoryModel">
+		<id column="food_category_id" property="foodCategoryId" />
+		<result column="food_category_name" property="foodCategoryName" />
+		<result column="delete_flag" property="deleteFlag" />
+		<result column="note" property="note" />
+		<result column="food_category_img_url" property="imgUrl" />
+		<collection property="foodList" column="food_id"
+			ofType="vn.com.arillance.cleanhome.model.FoodModel" resultMap="foodMap" />
+	</resultMap>
+	<resultMap id="foodMap" type="vn.com.arillance.cleanhome.model.FoodModel">
+		<id column="food_id" property="foodId" />
+		<result column="food_name" property="foodName" />
+		<result column="delete_flag" property="deleteFlag" />
+		<result column="describe" property="describe" />
+		<result column="protein" property="protein" />
+		<result column="fat" property="fat" />
+		<result column="carbohydrate" property="carbohydrate" />
+		<result column="note" property="note" />
+		<result column="price" property="price" />
+		<result column="quantity" property="quantity" />
+		<result column="food_img_url" property="imgUrl" />
+		<association property="shop"
+			resultMap="vn.com.arillance.cleanhome.mapper.UserMapper.empMap" />
+	</resultMap>
+	<resultMap id="commentMap" type="vn.com.arillance.cleanhome.model.CommentModel">
+		<id property="commentId" column="comment_id" />
+		<result column="employee_id" property="employeeId" />
+		<result column="owner_id" property="ownerId" />
+		<result column="content" property="content" />
+		<result column="order_id" property="orderId" />
+	</resultMap>
+	<resultMap id="districtMap"
+		type="vn.com.arillance.cleanhome.model.DistrictModel">
+		<id column="district_id" property="districtId" />
+		<result column="district_name" property="districtName" />
+		<result column="district_place" property="districtPlace" />
+		<result column="district_place_id" property="districtPlaceId" />
+
+	</resultMap>
+	<resultMap id="feedbackMap"
+		type="vn.com.arillance.cleanhome.model.FeedbackModel">
+		<id column="feedback_id" property="feedbackId" />
+		<result column="employee_id" property="employeeId" />
+		<result column="rate_total" property="rateTotal" />
+		<result column="rate_count" property="rateCount" />
+	</resultMap>
+	<!-- ######################################################################################################## -->
+
+
+	<select id="getActiveOrder" parameterType="int" resultMap="orderMap">
+		SELECT orders.*, food.*, employees.user_id AS emp_user_id,
+		employees.first_name AS emp_first_name, employees.last_name AS
+		emp_last_name, employees.img_url AS emp_img_url, employees.mobile AS
+		emp_mobile, employees.address AS emp_address, employees.email AS
+		emp_email, employees.website AS emp_website, users.*,
+		order_food_shop.quantity, food_users.price,
+		category.*, district.*,
+		roles.* FROM orders
+		JOIN order_food_shop ON
+		order_food_shop.order_id =
+		orders.order_id
+		JOIN
+		users
+		ON users.user_id =
+		orders.owner_id
+		JOIN food ON
+		order_food_shop.food_id =
+		food.food_id
+		JOIN
+		users AS employees ON
+		order_food_shop.assign_id =
+		employees.user_id
+		JOIN
+		food_users ON
+		food_users.user_id =
+		order_food_shop.assign_id AND food_users.food_id =
+		food.food_id
+		JOIN food_category ON
+		food_category.food_category_id
+		=
+		food.food_category_id
+		JOIN category ON
+		category.category_id =
+		food_category.category_id
+		JOIN district ON
+		district.district_id =
+		orders.district_id
+		JOIN roles ON roles.role_id =
+		employees.role
+		WHERE
+		orders.owner_id = #{userId}
+		AND orders.delete_flag = 0
+		AND
+		orders.confirm_flag = 0
+		AND food_users.status_flag = 1
+	</select>
+
+	<select id="getListCategory" resultMap="catMap">
+		SELECT *
+		FROM category
+		JOIN food_category ON food_category.category_id = category.category_id
+		WHERE category.delete_flag = 0
+	</select>
+
+	<select id="getListFoodCategory" resultMap="foodCatMap"
+		parameterType="int">
+		SELECT *
+		FROM food_category
+		WHERE category_id = #{catId}
+		AND delete_flag = 0
+	</select>
+
+	<select id="getListFood" resultMap="foodMap" parameterType="int">
+		SELECT *
+		FROM food
+		WHERE food_category_id = #{foodCatId}
+		AND delete_flag
+		= 0
+	</select>
+
+	<update id="removeOrder" parameterType="int">
+		UPDATE orders
+		SET
+		delete_flag = 1
+		WHERE order_id = #{orderId};
+	</update>
+	<select id="getOrderMaxCode" resultType="int">
+		SELECT
+		IFNULL(MAX(seq_number),0) FROM order_seq
+		WHERE delete_flag=0
+	</select>
+
+	<insert id="generateOrderCode" parameterType="int">
+		INSERT INTO
+		order_seq ( seq_number)
+		VALUES
+		(#{seqNumber});
+	</insert>
+</mapper>

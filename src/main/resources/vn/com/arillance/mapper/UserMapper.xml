@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="vn.com.arillance.cleanhome.mapper.UserMapper">
+
+	<!-- RESULT MAP ############################################################################################# -->
+
+
+	<resultMap id="userMap" type="vn.com.arillance.cleanhome.model.UserModel">
+		<id column="user_id" jdbcType="INTEGER" property="userId" />
+		<result column="user_name" property="username" />
+		<result column="first_name" property="firstName" />
+		<result column="last_name" property="lastName" />
+		<result column="img_url" property="imgUrl" />		
+		<result column="birthdate" property="birthdate" />
+		<result column="mobile" property="mobile" />
+		<result column="create_time" property="createdTime" />		
+		<!-- <result column="password" property="password" /> -->
+		<result column="delete_flag" property="deleteFlag" />
+		<result column="active_flag" property="activeFlag" />
+		<result column="address" property="address" />
+		<result column="email" property="email" />
+		<result column="noti_token" property="notiToken" />
+		<result column="website" property="website" />
+		<association property="role" resultMap="roleMap" />
+		<!-- <association property="feedback"
+			resultMap="vn.com.arillance.cleanhome.mapper.OrderMapper.feedbackMap" />
+		<collection property="comments" column="user_id"
+			ofType="vn.com.arillance.cleanhome.model.CommentModel" resultMap="vn.com.arillance.cleanhome.mapper.OrderMapper.commentMap">
+		</collection> -->
+		<collection property="listDistricts" column="user_id"
+			ofType="vn.com.arillance.cleanhome.model.DistrictModel" resultMap="vn.com.arillance.cleanhome.mapper.OrderMapper.districtMap">
+		</collection>
+	</resultMap>
+	<resultMap id="empMap" type="vn.com.arillance.cleanhome.model.UserModel">
+		<id column="emp_user_id" jdbcType="INTEGER" property="userId" />
+		<result column="emp_user_name" property="username" />
+		<result column="emp_first_name" property="firstName" />
+		<result column="emp_last_name" property="lastName" />
+		<result column="emp_img_url" property="imgUrl" />		
+		<result column="emp_birthdate" property="birthdate" />
+		<result column="emp_mobile" property="mobile" />
+		<result column="emp_create_time" property="createdTime" />		
+		<!-- <result column="password" property="password" /> -->
+		<result column="emp_delete_flag" property="deleteFlag" />
+		<result column="emp_active_flag" property="activeFlag" />
+		<result column="emp_address" property="address" />
+		<result column="emp_email" property="email" />
+		<result column="emp_noti_token" property="notiToken" />
+		<result column="emp_website" property="website" />
+		<association property="role" resultMap="roleMap" />
+		<!-- <association property="feedback"
+			resultMap="vn.com.arillance.cleanhome.mapper.OrderMapper.feedbackMap" />
+		<collection property="comments" column="user_id"
+			ofType="vn.com.arillance.cleanhome.model.CommentModel" resultMap="vn.com.arillance.cleanhome.mapper.OrderMapper.commentMap">
+		</collection> -->
+		<collection property="listDistricts" column="emp_user_id"
+			ofType="vn.com.arillance.cleanhome.model.DistrictModel" resultMap="vn.com.arillance.cleanhome.mapper.OrderMapper.districtMap">
+		</collection>
+	</resultMap>
+	
+	<resultMap id="roleMap" type="vn.com.arillance.cleanhome.model.RoleModel">
+		<id column="role_id" jdbcType="INTEGER" property="roleId" />
+		<result column="role_name" property="roleName" />
+		<result column="role_type" property="roleType" />
+	</resultMap>
+
+	<!-- ######################################################################################################## -->
+
+
+	<select id="login" resultMap="userMap" parameterType="map">
+		SELECT
+		users.*
+		FROM users
+		WHERE user_name =
+		#{userName}
+		AND
+		password=#{password}
+		AND delete_flag = 0
+	</select>
+
+	<select id="loginFb" resultMap="userMap" parameterType="String">
+		SELECT
+		district.*
+		FROM users
+		WHERE user_name = #{id}
+		AND delete_flag = 0
+	</select>
+
+	<insert id="createUser" parameterType="vn.com.arillance.cleanhome.model.UserModel"
+		useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+		INSERT INTO
+		users
+		(
+		user_name,
+		first_name,
+		last_name,
+		password,
+		img_url,
+		created_time,
+		birthdate,
+		mobile,
+		email
+		)
+		VALUES
+		(
+		#{userName},
+		#{firstName},
+		#{lastName},
+		#{password},
+		#{imgUrl},
+		#{createdTime},
+		#{birthdate},
+		#{mobile},
+		#{email}
+		);
+	</insert>
+</mapper>

@@ -1,0 +1,232 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="vn.com.arillance.cleanhome.mapper.JobMapper">
+
+	<!-- RESULT MAP ############################################################################################# -->
+	<resultMap id="jobMap" type="vn.com.arillance.cleanhome.model.JobModel">
+		<id column="id" jdbcType="INTEGER" property="id" />
+
+		<result column="job_id" property="jobId" />
+		<result column="job_name" property="jobName" />
+		<result column="job_description" property="jobDescription" />
+		<result column="start_time" property="startTime" />
+		<result column="end_time" property="endTime" />
+		<result column="delete_flag" property="deleteFlag" />
+		<result column="available_flag" property="availableFlag" />
+		<result column="latitude" property="latitude" />
+		<result column="longitude" property="longitude" />
+		<result column="salary" property="salary" />
+		<result column="wd_mon" property="wdMon" />
+		<result column="wd_tue" property="wdTue" />
+		<result column="wd_wed" property="wdWed" />
+		<result column="wd_thi" property="wdThi" />
+		<result column="wd_fri" property="wdFri" />
+		<result column="wd_sat" property="wdSat" />
+		<result column="wd_sun" property="wdSun" />
+		<result column="mon_start_time" property="monStartTime" />
+		<result column="mon_end_time" property="monEndTime" />
+		<result column="tue_start_time" property="tueStartTime" />
+		<result column="tue_end_time" property="tueEndTime" />
+		<result column="wed_start_time" property="wedStartTime" />
+		<result column="wed_end_time" property="wedEndTime" />
+		<result column="thi_start_time" property="thiStartTime" />
+		<result column="thi_end_time" property="thiEndTime" />
+		<result column="fri_start_time" property="friStartTime" />
+		<result column="fri_end_time" property="friEndTime" />
+		<result column="sat_start_time" property="satStartTime" />
+		<result column="sat_end_time" property="satEndTime" />
+		<result column="sun_start_time" property="sunStartTime" />
+		<result column="sun_end_time" property="sunEndTime" />
+		<result column="requirement" property="requirement" />
+		<result column="city" property="city" />
+		<result column="start_date" property="startDate" />
+		<result column="end_date" property="endDate" />
+		<result column="phone_number" property="phoneNumber" />
+		<result column="employee_type" property="employeeType" />
+		<result column="salary_unit" property="salaryUnit" />
+		<result column="distance" property="distance" />
+
+		<result column="job_done" property="jobDone" />
+		<result column="user_id" property="userId" />
+		<collection property="skills" column="skills" javaType="ArrayList"
+			ofType="java.lang.Integer">
+			<result property="skills" column="skills" />
+		</collection>
+
+	</resultMap>
+	<resultMap id="skillMap" type="vn.com.arillance.cleanhome.model.SkillSet">
+		<id column="id" jdbcType="INTEGER" property="skillId" />
+		<result column="skill" property="skillName" />
+		<result column="icon" property="icon" />
+
+	</resultMap>
+	<resultMap id="titleMap" type="vn.com.arillance.cleanhome.model.JobTitle">
+		<result column="title" property="title" />
+		<result column="cat_id" property="catId" />
+
+	</resultMap>
+
+	<!-- ######################################################################################################## -->
+
+	<select id="searchJob" resultMap="jobMap"
+		parameterType="vn.com.arillance.cleanhome.model.SearchJobModel">
+		SELECT jobs.*,jobs_skill.skill_id as skills
+		<if test="curPosition != null">
+			<if test="curPosition.latitude or curPosition.longitude">
+				,calcRange(${curPosition.latitude},${curPosition.longitude},jobs.latitude,jobs.longitude)
+				as distance
+			</if>
+		</if>
+		FROM jobs JOIN jobs_skill
+		ON jobs.job_id = jobs_skill.job_id WHERE
+		jobs.id > 0 AND
+		available_flag=1 AND jobs.delete_flag=0 
+		<if test="jobName != null">
+			<bind name="pattern" value="'%' + jobName + '%'" />
+			AND jobs.job_name like #{pattern}
+		</if>
+		<if test="phoneNumber != null">
+			<bind name="pphoneNumber" value="'%' + phoneNumber + '%'" />
+			AND phone_number like #{pphoneNumber}
+		</if>
+		<if test="employeeType >0"> AND employee_type = #{employeeType} </if>
+		<if
+			test="position!=null and position.latitude >0 and position.longitude >0"> AND latitude &gt;= #{position.southLatitude} AND
+			latitude &lt;=
+			#{position.northLatitude} AND longitude &gt;=
+			#{position.westLongitude} AND longitude &lt;=
+			#{position.eastLongitude}
+		</if>
+		<!-- full job -->
+		<if test="startDate != null and startTime == null">
+			AND start_date &gt;= #{startDate}
+		</if>
+		<!-- quick job search time -->
+		<if test="startDate != null and startTime != null">
+			AND start_date &gt;= #{startDate}
+			AND start_time
+			&gt;#{startTime}
+
+		</if>
+		<if test="city != null">
+			AND city = #{city}
+		</if>
+
+		<if test="weekdays != null">
+			<foreach item="wday" index="index" collection="weekdays">
+				<if test="wday.value==1">AND wd_mon = 1 AND mon_start_time &lt;=
+					#{wday.startTime} AND mon_end_time &gt;=#{wday.endTime} </if>
+				<if test="wday.value==2">AND wd_tue = 1 AND tue_start_time &lt;=
+					#{wday.startTime} AND tue_end_time &gt;=#{wday.endTime} </if>
+				<if test="wday.value==3">AND wd_wed = 1 AND wed_start_time &lt;=
+					#{wday.startTime} AND wed_end_time &gt;=#{wday.endTime} </if>
+				<if test="wday.value==4">AND wd_thi = 1 AND thi_start_time &lt;=
+					#{wday.startTime} AND thi_end_time &gt;=#{wday.endTime} </if>
+				<if test="wday.value==5">AND wd_fri = 1 AND fri_start_time &lt;=
+					#{wday.startTime} AND fri_end_time &gt;=#{wday.endTime} </if>
+				<if test="wday.value==6">AND wd_sat = 1 AND sat_start_time &lt;=
+					#{wday.startTime} AND sat_end_time &gt;=#{wday.endTime} </if>
+				<if test="wday.value==7">AND wd_sun = 1 AND sun_start_time &lt;=
+					#{wday.startTime} AND sun_end_time &gt;=#{wday.endTime} </if>
+			</foreach>
+		</if>
+		<if test="salaryFrom >0 and salaryTo >0">
+			AND salary &gt;= #{salaryFrom} AND salary
+			&lt;=#{salaryTo}
+			and salary_unit = #{salaryUnit}
+		</if>
+		<if test="jobDone >=0">
+			AND job_done = #{jobDone}
+		</if>
+		<if test="skills != null">
+			AND jobs.job_id IN (SELECT job_id FROM jobs_skill WHERE skill_id IN
+			<foreach item="id" index="index" collection="skills" open="("
+				separator="," close=")"> #{id}</foreach>
+			)
+		</if>
+		<if test="columnSort != null and orderSort!=null">
+			ORDER BY ${columnSort} ${orderSort}
+		</if>
+	</select>
+	<select id="getJob" parameterType="string"
+		resultType="vn.com.arillance.cleanhome.model.JobModel" resultMap="jobMap">
+		SELECT
+		*,jobs_skill.skill_id as skills FROM jobs JOIN jobs_skill
+		ON
+		jobs.job_id = jobs_skill.job_id
+		WHERE
+		jobs.job_id=#{jobId}
+	</select>
+	<insert id="createJob" parameterType="vn.com.arillance.cleanhome.model.JobModel"
+		useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+		INSERT INTO jobs
+		(job_name, job_id, delete_flag, start_time,
+		end_time,start_date,end_date,
+		employee_type,
+		salary,salary_unit,
+		latitude, longitude,city, wd_mon, wd_tue, wd_wed,
+		wd_thi, wd_fri,
+		wd_sat, wd_sun, job_description,
+		phone_number,user_id,requirement,mon_start_time,
+		mon_end_time,tue_start_time,tue_end_time,wed_start_time,
+		wed_end_time,thi_start_time,thi_end_time,fri_start_time,fri_end_time,
+		sat_start_time,sat_end_time,sun_start_time,sun_end_time)
+		VALUES
+		(#{jobName},#{jobId},0,#{startTime},#{endTime},#{startDate},#{endDate},#{employeeType},#{salary},#{salaryUnit},
+		#{latitude},#{longitude},#{city},#{wdMon},#{wdTue},#{wdWed},
+		#{wdThi},#{wdFri},#{wdSat},#{wdSun},#{jobDescription},#{phoneNumber},#{userId},#{requirement},#{monStartTime},
+		#{monEndTime}, #{tueStartTime}, #{tueEndTime}, #{wedStartTime},
+		#{wedEndTime}, #{thiStartTime}, #{thiEndTime}, #{friStartTime},
+		#{friEndTime}, #{satStartTime}, #{satEndTime}, #{sunStartTime},
+		#{sunEndTime});
+
+	</insert>
+
+	<insert id="createJobSkill" parameterType="vn.com.arillance.cleanhome.model.JobModel">
+		INSERT INTO jobs_skill(job_id,skill_id)
+		VALUES
+		<foreach collection="skills" item="item" index="index"
+			separator=",">
+			(#{jobId},#{item})
+		</foreach>
+	</insert>
+	<insert id="addTitle" parameterType="java.util.List">
+		INSERT INTO job_title(title)
+		VALUES
+		<foreach collection="list" item="item" index="index"
+			separator=",">
+			(#{item})
+		</foreach>
+	</insert>
+	<select id="getSkillSet" parameterType="string"
+		resultType="vn.com.arillance.cleanhome.model.SkillSet" resultMap="skillMap">
+		SELECT
+		* FROM skill_set WHERE delete_flag=0
+	</select>
+	<select id="getMaxIdDb" resultType="INTEGER">
+		SELECT id from jobs ORDER BY
+		id DESC LIMIT 1
+	</select>
+	<select id="getListCity" resultType="string">
+		SELECT city FROM jobs GROUP
+		BY city
+	</select>
+	<select id="getListJob" resultMap="titleMap">
+		SELECT * FROM job_title
+	</select>
+	<select id="getListJobByUser" resultMap="jobMap" parameterType="String">
+		SELECT
+		*,jobs_skill.skill_id as skills FROM jobs JOIN jobs_skill
+		ON
+		jobs.job_id = jobs_skill.job_id
+		WHERE
+		delete_flag=0 AND
+		user_id=#{userId}
+	</select>
+	<update id="updateFlag" parameterType="vn.com.arillance.cleanhome.model.SearchModel">
+		UPDATE jobs SET
+		available_flag = #{availableFlag} WHERE job_id = #{jobId}
+	</update>
+</mapper>

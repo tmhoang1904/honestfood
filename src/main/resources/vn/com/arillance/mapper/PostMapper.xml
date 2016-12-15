@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="vn.com.arillance.cleanhome.mapper.PostMapper">
+
+	<!-- RESULT MAP ############################################################################################# -->
+	<resultMap id="postMap" type="vn.com.arillance.cleanhome.model.PostModel" >
+		<id column="post_id" jdbcType="INTEGER" property="postId" />
+		<result column="post_title" property="postTitle" />
+		<result column="post_content" property="postContent" />
+		<result column="create_date" property="createDate" />
+		<result column="delete_flag" property="deleteFlag" />
+		<result column="enable_flag" property="enableFlag" />
+		<result column="image_url" property="imageUrl" />
+		<result column="view_count" property="viewCount" />
+		<association property="category" resultMap="categoryMap" />
+		<association property="author" resultMap="userMap" />
+
+	</resultMap>
+
+	<resultMap id="categoryMap" type="vn.com.arillance.cleanhome.model.CategoryModel">
+		<id column="category_id" property="catId" />
+		<result column="category_name" property="catName" />
+	</resultMap>
+	<resultMap id="userMap" type="vn.com.arillance.cleanhome.model.UserModel">
+		<id column="id" property="userId" />
+		<result column="username" property="userName" />
+		<result column="email" property="email" />
+		<result column="date_joined" property="createDate" />
+	</resultMap>
+	<!-- ######################################################################################################## -->
+
+
+	<select id="getAllPosts" resultMap="postMap" parameterType="Map" >
+		SELECT posts.*,category.*,auth_user.*, (posts.view_count+posts.like_count) AS point
+		FROM
+		posts JOIN
+		category ON
+		posts.post_category_id=category.category_id
+		JOIN auth_user ON
+		posts.post_author_id=auth_user.id
+		WHERE
+		posts.post_id>0
+		<if test="title != null and title != ''">
+			<bind name="pattern" value="'%' + title + '%'" />
+
+			AND post_title like #{pattern}
+		</if>
+		<if test="incDeleted != true">
+			AND posts.delete_flag=0
+		</if>
+		<if test="incDisable != true">
+			AND posts.enable_flag=1
+		</if>
+		<if test="categoryId != null and categoryId>0">
+			AND posts.post_category_id= #{categoryId}
+		</if>
+		<if test="startDate != null">
+			AND posts.create_date>= #{startDate}
+		</if>
+		<if test="endDate != null">
+			AND posts.end_date &lt;= #{endDate}
+		</if>
+		<if test="authorId != null and authorId > 0">
+			AND posts.post_author_id= #{authorId}
+		</if>
+		
+		ORDER BY ${orderb} DESC LIMIT #{offset} OFFSET #{page}
+	</select>
+
+	<insert id="insertPost" parameterType="vn.com.arillance.cleanhome.model.PostModel"
+		useGeneratedKeys="true" keyProperty="postId" keyColumn="post_id">
+		INSERT INTO
+		posts(post_title,post_content,post_author_id,create_date,post_category_id,image_url)
+		VALUES(#{postTitle},#{postContent},#{author.userId},#{createDateDb},#{category.catId},#{imageUrl}) 
+	</insert>
+
+	<update id="updatePost" parameterType="vn.com.arillance.cleanhome.model.PostModel">
+		UPDATE posts
+		SET
+		post_title=#{postTitle}, post_content=#{postContent},
+		post_category_id=#{category.catId},image_url=#{imageUrl}
+		WHERE
+		post_id=#{postId};
+	</update>
+
+	<update id="deletePost" parameterType="int">
+		UPDATE posts
+		SET
+		delete_flag=1
+		WHERE
+		post_id=#{postId};
+	</update>
+	<update id="enablePost" parameterType="int">
+		UPDATE posts
+		SET
+		enable_flag=1
+		WHERE
+		post_id=#{postId};
+	</update>
+	<select id="getPostById" parameterType="int"
+		resultType="vn.com.arillance.cleanhome.model.PostModel" resultMap="postMap">
+		SELECT
+		posts.*,category.*,auth_user.*
+		FROM
+		posts JOIN
+		category ON
+		posts.post_category_id=category.category_id
+		JOIN auth_user ON
+		posts.post_author_id=auth_user.id
+		WHERE
+		posts.post_id=#{postId} AND
+		posts.delete_flag=0
+	</select>
+
+	<update id="updateCount" parameterType="int">
+		UPDATE posts
+		SET
+		view_count=view_count+1
+		WHERE post_id = #{postId}
+	</update>
+
+</mapper>
