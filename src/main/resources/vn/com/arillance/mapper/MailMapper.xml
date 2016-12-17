@@ -2,10 +2,10 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
   "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="vn.com.arillance.cleanhome.mapper.MailMapper">
+<mapper namespace="vn.com.arillance.honestfood.mapper.MailMapper">
 
 	<!-- RESULT MAP ############################################################################################# -->
-	<resultMap id="mailMap" type="vn.com.arillance.cleanhome.model.MailModel">
+	<resultMap id="mailMap" type="vn.com.arillance.honestfood.model.MailModel">
 		<id column="mail_id" jdbcType="INTEGER" property="mailId" />
 		<result column="title" property="title" />
 		<result column="content" property="content" />
@@ -55,7 +55,7 @@
 		WHERE mail_id = #{mailId}		
 	</update>
 
-	<insert id="insertMail" parameterType="vn.com.arillance.cleanhome.model.MailModel"
+	<insert id="insertMail" parameterType="vn.com.arillance.honestfood.model.MailModel"
 		useGeneratedKeys="true" keyProperty="id" keyColumn="id">
 		INSERT INTO
 		mail

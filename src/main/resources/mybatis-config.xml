@@ -14,7 +14,7 @@
 	<environments default="development">
 		<environment id="dev">
 			<transactionManager type="JDBC" />
-			<dataSource type="vn.com.arillance.cleanhome.dao.C3P0DataSourceFactory">
+			<dataSource type="vn.com.arillance.honestfood.dao.C3P0DataSourceFactory">
 				<property name="driverClass" value="${dev.jdbc.driverClassName}" />
 				<property name="jdbcUrl" value="${dev.jdbc.url}" />
 				<property name="user" value="${dev.jdbc.username}" />
@@ -36,7 +36,7 @@
 		</environment>
 		<environment id="pro">
 			<transactionManager type="JDBC" />
-			<dataSource type="vn.com.arillance.cleanhome.dao.C3P0DataSourceFactory">
+			<dataSource type="vn.com.arillance.honestfood.dao.C3P0DataSourceFactory">
 				<property name="driverClass" value="${pro.jdbc.driverClassName}" />
 				<property name="jdbcUrl" value="${pro.jdbc.url}" />
 				<property name="user" value="${pro.jdbc.username}" />
@@ -59,7 +59,7 @@
 		</environment>
 	</environments>
 	<mappers>
-		<!-- <package name="vn.com.arillance.cleanhome.mapper.*"/> -->				
+		<!-- <package name="vn.com.arillance.honestfood.mapper.*"/> -->				
 		<mapper resource="vn/com/arillance/mapper/UserMapper.xml" />
 		<mapper resource="vn/com/arillance/mapper/OrderMapper.xml" />
 		<mapper resource="vn/com/arillance/mapper/MailMapper.xml" />

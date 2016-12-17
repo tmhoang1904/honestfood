@@ -9,15 +9,16 @@
 	<logger name="java.sql" level="DEBUG">
 		<appender-ref ref="STDOUT" />
 	</logger>
-	<logger name="vn.com.arillance.cleanhome.mapper.UserMapper"
+	<logger name="vn.com.arillance.honestfood.mapper.UserMapper"
 		level="DEBUG" />
-	<logger name="vn.com.arillance.cleanhome.mapper.OrderMapper" level="DEBUG" />
-	
-	<logger name="vn.com.arillance.cleanhome.mapper.TermMapper" level="DEBUG" />
+	<logger name="vn.com.arillance.honestfood.mapper.OrderMapper"
+		level="DEBUG" />
+	<logger name="vn.com.arillance.honestfood.mapper.MailMapper"
+		level="DEBUG" />
 
 	<root>
 		<level value="ERROR" />
 		<appender-ref ref="STDOUT" />
 	</root>
-	
+
 </configuration>

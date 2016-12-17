@@ -2,12 +2,12 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
   "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="vn.com.arillance.cleanhome.mapper.UserMapper">
+<mapper namespace="vn.com.arillance.honestfood.mapper.UserMapper">
 
 	<!-- RESULT MAP ############################################################################################# -->
 
 
-	<resultMap id="userMap" type="vn.com.arillance.cleanhome.model.UserModel">
+	<resultMap id="userMap" type="vn.com.arillance.honestfood.model.UserModel">
 		<id column="user_id" jdbcType="INTEGER" property="userId" />
 		<result column="user_name" property="username" />
 		<result column="first_name" property="firstName" />
@@ -25,15 +25,15 @@
 		<result column="website" property="website" />
 		<association property="role" resultMap="roleMap" />
 		<!-- <association property="feedback"
-			resultMap="vn.com.arillance.cleanhome.mapper.OrderMapper.feedbackMap" />
+			resultMap="vn.com.arillance.honestfood.mapper.OrderMapper.feedbackMap" />
 		<collection property="comments" column="user_id"
-			ofType="vn.com.arillance.cleanhome.model.CommentModel" resultMap="vn.com.arillance.cleanhome.mapper.OrderMapper.commentMap">
+			ofType="vn.com.arillance.honestfood.model.CommentModel" resultMap="vn.com.arillance.honestfood.mapper.OrderMapper.commentMap">
 		</collection> -->
 		<collection property="listDistricts" column="user_id"
-			ofType="vn.com.arillance.cleanhome.model.DistrictModel" resultMap="vn.com.arillance.cleanhome.mapper.OrderMapper.districtMap">
+			ofType="vn.com.arillance.honestfood.model.DistrictModel" resultMap="vn.com.arillance.honestfood.mapper.OrderMapper.districtMap">
 		</collection>
 	</resultMap>
-	<resultMap id="empMap" type="vn.com.arillance.cleanhome.model.UserModel">
+	<resultMap id="empMap" type="vn.com.arillance.honestfood.model.UserModel">
 		<id column="emp_user_id" jdbcType="INTEGER" property="userId" />
 		<result column="emp_user_name" property="username" />
 		<result column="emp_first_name" property="firstName" />
@@ -51,16 +51,16 @@
 		<result column="emp_website" property="website" />
 		<association property="role" resultMap="roleMap" />
 		<!-- <association property="feedback"
-			resultMap="vn.com.arillance.cleanhome.mapper.OrderMapper.feedbackMap" />
+			resultMap="vn.com.arillance.honestfood.mapper.OrderMapper.feedbackMap" />
 		<collection property="comments" column="user_id"
-			ofType="vn.com.arillance.cleanhome.model.CommentModel" resultMap="vn.com.arillance.cleanhome.mapper.OrderMapper.commentMap">
+			ofType="vn.com.arillance.honestfood.model.CommentModel" resultMap="vn.com.arillance.honestfood.mapper.OrderMapper.commentMap">
 		</collection> -->
 		<collection property="listDistricts" column="emp_user_id"
-			ofType="vn.com.arillance.cleanhome.model.DistrictModel" resultMap="vn.com.arillance.cleanhome.mapper.OrderMapper.districtMap">
+			ofType="vn.com.arillance.honestfood.model.DistrictModel" resultMap="vn.com.arillance.honestfood.mapper.OrderMapper.districtMap">
 		</collection>
 	</resultMap>
 	
-	<resultMap id="roleMap" type="vn.com.arillance.cleanhome.model.RoleModel">
+	<resultMap id="roleMap" type="vn.com.arillance.honestfood.model.RoleModel">
 		<id column="role_id" jdbcType="INTEGER" property="roleId" />
 		<result column="role_name" property="roleName" />
 		<result column="role_type" property="roleType" />
@@ -88,7 +88,7 @@
 		AND delete_flag = 0
 	</select>
 
-	<insert id="createUser" parameterType="vn.com.arillance.cleanhome.model.UserModel"
+	<insert id="createUser" parameterType="vn.com.arillance.honestfood.model.UserModel"
 		useGeneratedKeys="true" keyProperty="id" keyColumn="id">
 		INSERT INTO
 		users
