@@ -67,98 +67,61 @@ public class OrderDao {
 		return listFood;
 	}
 
-	public int addToCart(CartModel cart) {
+	// public OrderModel addToCart(OrderModel order) {
+	// SqlSession session = MyBatisUtils.getSqlSessionFactory().openSession();
+	// OrderMapper mapper = session.getMapper(OrderMapper.class);
+	//
+	//
+	// session.close();
+	//
+	// }
+
+	public OrderModel reqOrder(OrderModel order) {
 		SqlSession session = MyBatisUtils.getSqlSessionFactory().openSession();
 		OrderMapper mapper = session.getMapper(OrderMapper.class);
-		
-		int cartId = 0;
-		
-		cart.setCreatedTime(new Timestamp(Calendar.getInstance().getTime().getTime()));
-		
-//		double cartAmount = cart.caculateCartAmount();
-//		cart.setCartAmount(cartAmount);
-		
-		int cartExists = mapper.checkCartExists(cart.getCartId());
-		int insert = 0;
-		if (cartExists <= 0) {
-			insert = mapper.addNewCart(cart);
+
+		UserMapper userMapper = session.getMapper(UserMapper.class);
+
+		// caculate shift fee
+		double shiftFee;
+		if (order.getBillAmount() <= 200000) {
+			shiftFee = 30000;
 		} else {
-			insert = 1;
+			shiftFee = 0;
 		}
+		order.setShiftFee(shiftFee);
 
-		if (insert > 0) {
-			if (cart.getCartId() > 0) {
-				cartId = mapper.getCartIdOfUser(cart.getCartOwner().getUserId());
-				cart.setCartId(cartId);
-			}			
+		mapper.requestOrder(order);
 
-			List<HashMap<String, Integer>> maps = new ArrayList<>();
-			for (FoodUsersModel foodShop : cart.getFoodShopList()) {
-				HashMap<String, Integer> map = new HashMap<String, Integer>();
-				map.put("cartId", cart.getCartId());
-				map.put("foodId", foodShop.getFood().getFoodId());
-				map.put("assignId", foodShop.getShop().getUserId());
-				map.put("quantity", foodShop.getQuantity());
-				maps.add(map);
+		String orderCode = "CH" + Calendar.getInstance().get(Calendar.DAY_OF_MONTH) + ""
+				+ (Calendar.getInstance().get(Calendar.MONTH) + 1) + "" + Calendar.getInstance().get(Calendar.YEAR)
+				+ +order.getOrderId();
+
+		order.setOrderCode(orderCode);
+
+		mapper.updateOrderCode(order);
+
+		if ((order.getOrderId() > 0) && (order.getFoodList().size() > 0)) {
+			try {
+				mapper.requestOrderFoodShop(order);
+
+				session.commit();
+
+			} catch (Exception e) {
+				e.printStackTrace();
+				mapper.removeOrder(order.getOrderId());
 			}
 
-			insert = mapper.requestCartFoodShop(maps);
-			if (insert > 0) {
-				mapper.updateCartAmount(cart);
-			}
-
-			session.commit();
-		}
-		session.close();
-		return cartId;
-	}
-
-//	public OrderModel reqOrder(OrderModel order) {
-//		SqlSession session = MyBatisUtils.getSqlSessionFactory().openSession();
-//		OrderMapper mapper = session.getMapper(OrderMapper.class);
-//
-//		UserMapper userMapper = session.getMapper(UserMapper.class);
-//
-//		// caculate shift fee
-//		double shiftFee;
-//		if (order.getBillAmount() <= 200000) {
-//			shiftFee = 30000;
-//		} else {
-//			shiftFee = 0;
-//		}
-//		order.setShiftFee(shiftFee);
-//
-//		mapper.requestOrder(order);
-//
-//		String orderCode = "CH" + Calendar.getInstance().get(Calendar.DAY_OF_MONTH) + ""
-//				+ (Calendar.getInstance().get(Calendar.MONTH) + 1) + "" + Calendar.getInstance().get(Calendar.YEAR)
-//				+ +order.getOrderId();
-//
-//		order.setOrderCode(orderCode);
-//
-//		mapper.updateOrderCode(order);
-//
-//		if ((order.getOrderId() > 0) && ((order.getCart() != null) && (order.getCart().getFoodShopList().size() > 0))) {
-//			try {
-//				mapper.requestOrderFoodShop(order);
-//
-//				session.commit();
-//
-//			} catch (Exception e) {
-//				e.printStackTrace();
-//				mapper.removeOrder(order.getOrderId());
-//			}
-//
 //			new Thread(new Runnable() {
 //				@Override
 //				public void run() {
 //					// TODO Auto-generated method stub
 //					// Push notification for employee
-//					if (order.getCart() != null) {
+//					if (order.getFoodList() != null) {
 //						List<String> notiTokens = new ArrayList<String>();
 //						UserDao userDao = new UserDao();
-//						for (FoodUsersModel foodShop : order.getCart().getFoodShopList()) {
-//							String notiToken = userDao.getNotiToken(foodShop.getShop().getUserId());
+//						for (FoodModel food : order.getFoodList()) {
+//							String notiToken = userDao.getNotiToken(food.getShop().getUserId());
 //							notiTokens.add(notiToken);
 //							HTTPUtils.pushNotficationToAllDevices(notiToken, "Bạn có đơn hàng mới",
 //									"Bạn vừa nhận được đơn hàng mới!", HTTPUtils.NEW_ORDER);
@@ -166,12 +129,11 @@ public class OrderDao {
 //					}
 //
 //				}
-//
 //			}).start();
-//		}
-//		session.close();
-//		return order;
-//	}
+		}
+		session.close();
+		return order;
+	}
 
 	public ArrayList<OrderModel> getHistoryOrder(int ownerId) {
 		SqlSession session = MyBatisUtils.getSqlSessionFactory().openSession();

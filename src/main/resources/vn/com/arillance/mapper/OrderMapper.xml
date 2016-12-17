@@ -80,10 +80,9 @@
 		<result column="carbohydrate" property="carbohydrate" />
 		<result column="note" property="note" />
 		<result column="price" property="price" />
+		<result column="calories" property="calories" />
 		<result column="quantity" property="quantity" />
 		<result column="food_img_url" property="imgUrl" />
-		<association property="shop"
-			resultMap="vn.com.arillance.cleanhome.mapper.UserMapper.empMap" />
 	</resultMap>
 	<resultMap id="commentMap" type="vn.com.arillance.cleanhome.model.CommentModel">
 		<id property="commentId" column="comment_id" />
@@ -111,51 +110,77 @@
 
 
 	<select id="getActiveOrder" parameterType="int" resultMap="orderMap">
-		SELECT orders.*, food.*, employees.user_id AS emp_user_id,
-		employees.first_name AS emp_first_name, employees.last_name AS
-		emp_last_name, employees.img_url AS emp_img_url, employees.mobile AS
-		emp_mobile, employees.address AS emp_address, employees.email AS
-		emp_email, employees.website AS emp_website, users.*,
-		order_food_shop.quantity, food_users.price,
-		category.*, district.*,
-		roles.* FROM orders
-		JOIN order_food_shop ON
-		order_food_shop.order_id =
+		SELECT orders.*, food.*, users.*,
+		order_food.quantity,
+		category.*,
+		district.*,
+		food_category.* FROM orders
+		JOIN order_food ON
+		order_food.order_id =
 		orders.order_id
 		JOIN
 		users
 		ON users.user_id =
 		orders.owner_id
 		JOIN food ON
-		order_food_shop.food_id =
+		order_food.food_id =
 		food.food_id
 		JOIN
-		users AS employees ON
-		order_food_shop.assign_id =
-		employees.user_id
-		JOIN
-		food_users ON
-		food_users.user_id =
-		order_food_shop.assign_id AND food_users.food_id =
-		food.food_id
-		JOIN food_category ON
+		food_category ON
 		food_category.food_category_id
 		=
 		food.food_category_id
 		JOIN category ON
 		category.category_id =
 		food_category.category_id
-		JOIN district ON
+		JOIN
+		district ON
 		district.district_id =
 		orders.district_id
-		JOIN roles ON roles.role_id =
-		employees.role
 		WHERE
 		orders.owner_id = #{userId}
-		AND orders.delete_flag = 0
+		AND
+		orders.delete_flag =
+		0
 		AND
 		orders.confirm_flag = 0
-		AND food_users.status_flag = 1
+	</select>
+
+	<select id="getHistoryOrder" parameterType="int" resultMap="orderMap">
+		SELECT orders.*, food.*, users.*,
+		order_food.quantity,
+		category.*,
+		district.*,
+		food_category.* FROM orders
+		JOIN order_food ON
+		order_food.order_id =
+		orders.order_id
+		JOIN
+		users
+		ON users.user_id =
+		orders.owner_id
+		JOIN food ON
+		order_food.food_id =
+		food.food_id
+		JOIN
+		food_category ON
+		food_category.food_category_id
+		=
+		food.food_category_id
+		JOIN category ON
+		category.category_id =
+		food_category.category_id
+		JOIN
+		district ON
+		district.district_id =
+		orders.district_id
+		WHERE
+		orders.owner_id = #{userId}
+		AND
+		orders.delete_flag =
+		0
+		AND
+		orders.confirm_flag = 1
 	</select>
 
 	<select id="getListCategory" resultMap="catMap">
@@ -180,6 +205,18 @@
 		AND delete_flag
 		= 0
 	</select>
+
+	<insert id="requestOrderFoodShop" parameterType="vn.com.arillance.cleanhome.model.OrderModel"
+		useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+		INSERT INTO order_food_shop (order_id, food_id, assign_id, quantity)
+		VALUES
+		<foreach collection="foodList" item="food" separator=",">
+			(#{orderId},
+			#{food.foodId},
+			#{food.assign_id},
+			#{food.quantity})
+		</foreach>
+	</insert>
 
 	<update id="removeOrder" parameterType="int">
 		UPDATE orders

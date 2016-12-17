@@ -1,6 +1,18 @@
 package vn.com.arillance.cleanhome.model;
 
 public class FoodModel {
+	/*
+	 Nam: [ (13.397 x Trọng lượng kg) + (4.799 x Chiều cao cm) - (5.677 x Tuổi năm) + 88.362 ]
+
+	Nữ  : [ (9.247 x Trọng lượng kg) + (3.098 x Chiều cao cm) - (4.330 x Tuổi năm) + 447.593 ]
+	
+	 Nhóm 1. Ít hoặc không vận động: BMR x 1.2
+Nhóm 2. Vận động nhẹ: 1-3 lần/1 tuần: BMR x 1.375
+Nhóm 3. Vận động vừa phải: 3-5 lần/ 1 tuần:  BMR x 1.55
+Nhóm 4. Vận động nhiều: 6-7 lần/1 tuần: BMR x 1.725
+Nhóm 5. Vận động nặng: Trên 7 lần 1 tuần: BMR x 1.9
+	 
+	 */
 	private int foodId;
 	private String foodName;
 	private String describe;
@@ -11,8 +23,8 @@ public class FoodModel {
 	private String note;
 	private String imgUrl;
 	private double price;
-	private int quantity;
-	private UserModel shop;
+	private double calories;
+	private int quantity;	
 	public int getFoodId() {
 		return foodId;
 	}
@@ -79,11 +91,11 @@ public class FoodModel {
 	public void setQuantity(int quantity) {
 		this.quantity = quantity;
 	}
-	public UserModel getShop() {
-		return shop;
+	public double getCalories() {
+		return calories;
 	}
-	public void setShop(UserModel shop) {
-		this.shop = shop;
+	public void setCalories(double calories) {
+		this.calories = calories;
 	}	
 	
 }

@@ -135,51 +135,9 @@ public class HackathonController {
 	@Path("/requestorder")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public HashMap<String, Integer> addToCart(OrderModel order){
-		OrderDao orderDao = new OrderDao();
-		CartModel cart = new CartModel();
-		JSONObject jsonObj = new JSONObject();
-		
-		cart.setCartId(jsonObj.getInt("cartId"));
-		UserModel owner = new UserModel();
-		owner.setUserId(jsonObj.getInt("ownerId"));
-		cart.setCartOwner(owner);
-		
-		//Get all food Id
-		JSONArray jsonArr = jsonObj.getJSONArray("foodShop");		
-		List<FoodUsersModel> foodShopList = new ArrayList<FoodUsersModel>();
-		
-		for (int i = 0; i < jsonArr.length(); i++){
-			JSONObject obj = jsonArr.getJSONObject(i);
-			FoodUsersModel foodShop = new FoodUsersModel();
-			
-			UserModel shop = new UserModel();
-			shop.setUserId(obj.getInt("assignId"));
-			
-			FoodModel food = new FoodModel();
-			food.setFoodId(obj.getInt("foodId"));
-			
-			foodShop.setShop(shop);
-			foodShop.setFood(food);
-			foodShop.setQuantity(obj.getInt("quantity"));
-			
-			foodShopList.add(foodShop);
-		}
-		
-		cart.setFoodShopList(foodShopList);
-		
-		/*
-		 * (#{cartId},
-			#{foodId},
-			#{assignId},
-			#{quantity}
-		 */
-		
-		int cartId = orderDao.addToCart(cart);
-		
-		HashMap<String, Integer> result = new HashMap<String, Integer>();
-		result.put("cartId", cartId);
-		return result;
+	public OrderModel addToCart(OrderModel order){
+		OrderDao orderDao = new OrderDao();		
+		return orderDao.reqOrder(order);
 	}
 
 //	@POST
@@ -202,7 +160,7 @@ public class HackathonController {
 	}
 
 	@GET
-	@Path("/getlistemployeeavailotherservices")
+	@Path("/getlistemployeeavail")
 	@Produces(MediaType.APPLICATION_JSON)
 	public List<UserModel> getListEmployeeAvailForOtherServices(@QueryParam("serviceid") int serviceId,
 			@QueryParam("districtid") int districtId, @QueryParam("additionalserviceid") int additionalServiceId) throws Exception {
